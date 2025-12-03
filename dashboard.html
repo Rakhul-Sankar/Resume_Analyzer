@@ -1,70 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-  <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
-
+<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
+    
     <!-- Dynamic Greeting -->
     <h2 id="greeting" class="text-2xl font-bold mb-4"></h2>
 
     <p class="mb-6">Continue to upload your resume.</p>
 
-    <a href="upload.html"
+    <a href="upload.html" 
        class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
-      Upload Resume
+        Upload Resume
     </a>
-  </div>
+</div>
 
-  <script>
-    // Wrap in DOMContentLoaded so element is present
-    document.addEventListener('DOMContentLoaded', function () {
-      try {
-        // 1) Try localStorage first
-        let username = null;
-        try {
-          username = localStorage.getItem('username');
-        } catch (e) {
-          // localStorage may throw on some restricted contexts
-          console.warn('localStorage access error:', e);
-        }
+<script>
+    // ⬅ Fetch username saved from login page
+    let username = localStorage.getItem("username");
 
-        // 2) Fallback: try URL param ?username=Rakhul (useful for static testing)
-        if (!username) {
-          const params = new URLSearchParams(window.location.search);
-          username = params.get('username'); // may be null
-        }
+    // Default fallback
+    if (!username) username = "User";
 
-        // 3) Final fallback
-        if (!username || username.trim() === '') {
-          username = 'User';
-        }
+    // Time-based greeting
+    const hour = new Date().getHours();
+    let timeGreeting = "";
 
-        // Time-of-day greeting
-        const hour = new Date().getHours();
-        let timeGreeting = 'Good Evening';
-        if (hour >= 5 && hour < 12) timeGreeting = 'Good Morning';
-        else if (hour >= 12 && hour < 17) timeGreeting = 'Good Afternoon';
+    if (hour >= 5 && hour < 12) {
+        timeGreeting = "Good Morning";
+    } else if (hour >= 12 && hour < 17) {
+        timeGreeting = "Good Afternoon";
+    } else {
+        timeGreeting = "Good Evening";
+    }
 
-        // Put it on the page
-        const greetingEl = document.getElementById('greeting');
-        greetingEl.textContent = `Welcome ${username}, ${timeGreeting}!`;
+    // Display final text
+    document.getElementById("greeting").innerText =
+        `Welcome ${username}, ${timeGreeting}!`;
+</script>
 
-        // Debug info (visible in console)
-        console.log('Greeting set:', { username, timeGreeting, hour });
-
-      } catch (err) {
-        console.error('Greeting script error:', err);
-        // fail gracefully: show a simple message
-        const el = document.getElementById('greeting');
-        if (el) el.textContent = 'Welcome! Continue to upload your resume.';
-      }
-    });
-  </script>
 </body>
 </html>
