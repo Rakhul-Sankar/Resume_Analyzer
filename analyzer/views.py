@@ -8,6 +8,10 @@ import docx
 # -----------------------------
 # Authentication Views
 # -----------------------------
+
+def login_page(request):
+    return render(request, 'login.html')
+
 def signup_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
