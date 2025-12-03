@@ -1,63 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Analysis</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 flex flex-col items-center p-6 min-h-screen">
 
-<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+<div class="w-full max-w-4xl">
 
-<div class="w-full max-w-4xl bg-white p-6 rounded-xl shadow">
+    <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Resume Analysis Result</h1>
 
-    <h2 class="text-2xl font-bold text-blue-600 mb-4">Resume Analysis Result</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- ATS Score -->
-    <div class="bg-blue-100 p-6 rounded-xl mb-4 text-center">
-        <h3 class="text-xl font-semibold">ATS Score</h3>
-        <p id="atsScore" class="text-4xl font-bold mt-3">0%</p>
+        <!-- ATS Score -->
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+            <h2 class="text-xl font-semibold mb-2">ATS Score</h2>
+            <p id="atsScore" class="text-4xl font-bold text-blue-600 mt-4">--%</p>
+        </div>
+
+        <!-- Skills Found -->
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h2 class="text-xl font-semibold mb-2">Skills Found</h2>
+            <ul id="skillsList" class="list-disc pl-5 mt-4"></ul>
+        </div>
+
     </div>
 
-    <!-- Skills Found -->
-    <div class="bg-green-100 p-6 rounded-xl">
-        <h3 class="text-xl font-semibold">Skills Found</h3>
-        <ul id="skillsList" class="list-disc pl-5 mt-4"></ul>
-    </div>
+    <a href="dashboard.html" class="mt-10 bg-gray-700 text-white px-6 py-3 rounded-xl hover:bg-gray-800">
+        Back to Dashboard
+    </a>
+
 </div>
 
 <script>
-// List of skills to detect
-const SKILLS = ["python", "django", "html", "css", "javascript", "sql", "react", "node"];
-
-// Fetch resume text
-const resume = localStorage.getItem("resumeData");
-
-if (!resume) {
-    alert("No resume found! Upload again.");
-    window.location.href = "upload.html";
-}
-
-// Skill extraction
-let foundSkills = [];
-
-SKILLS.forEach(skill => {
-    if (resume.toLowerCase().includes(skill)) {
-        foundSkills.push(skill);
+    // Fetch uploaded resume from localStorage
+    const resume = localStorage.getItem("resumeContent");
+    if (!resume) {
+        alert("No resume found! Please upload first.");
+        window.location.href = "upload.html";
     }
-});
 
-// Display found skills
-const list = document.getElementById("skillsList");
-foundSkills.forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s.toUpperCase();
-    list.appendChild(li);
-});
+    // Simulate ATS Score (for demo)
+    const atsScore = Math.floor(Math.random() * 21) + 80; // 80-100%
+    document.getElementById("atsScore").innerText = atsScore + "%";
 
-// ATS Score
-const score = Math.round((foundSkills.length / SKILLS.length) * 100);
-document.getElementById("atsScore").innerText = score + "%";
+    // List of skills to detect
+    const skills = ["Python", "Django", "HTML", "CSS", "JavaScript", "SQL", "React", "Node.js"];
+
+    const foundSkills = skills.filter(skill => {
+        const regex = new RegExp(`\\b${skill}\\b`, "i");
+        return regex.test(resume);
+    });
+
+    const skillsList = document.getElementById("skillsList");
+    if (foundSkills.length > 0) {
+        foundSkills.forEach(skill => {
+            const li = document.createElement("li");
+            li.textContent = skill;
+            skillsList.appendChild(li);
+        });
+    } else {
+        skillsList.innerHTML = "<li>No matching skills found.</li>";
+    }
 </script>
 
 </body>
