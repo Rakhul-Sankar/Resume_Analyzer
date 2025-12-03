@@ -16,7 +16,7 @@
     <form onsubmit="saveUser(event)" class="space-y-4">
 
         <!-- Username Input -->
-        <input id="username" type="text" placeholder="Username"
+        <input id="username" name="username" type="text" placeholder="Username"
                class="w-full p-3 border rounded-lg" required>
 
         <!-- Password Input -->
@@ -33,20 +33,18 @@
         No account?
         <a href="signup.html" class="text-blue-600">Create one</a>
     </p>
-
 </div>
 
 <script>
-    // Save username when user logs in
     function saveUser(event) {
-        event.preventDefault();  // Stop form refresh
+        event.preventDefault();
 
         const username = document.getElementById("username").value;
 
-        // Save to localStorage
+        // Save username in localStorage
         localStorage.setItem("username", username);
 
-        // Redirect to dashboard
+        // Redirect
         window.location.href = "dashboard.html";
     }
 </script>

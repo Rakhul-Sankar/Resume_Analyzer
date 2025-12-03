@@ -10,38 +10,33 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
-    
-    <!-- Dynamic Greeting -->
+
+    <!-- Greeting -->
     <h2 id="greeting" class="text-2xl font-bold mb-4"></h2>
 
     <p class="mb-6">Continue to upload your resume.</p>
 
-    <a href="upload.html" 
-       class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
+    <a href="upload.html" class="bg-purple-600 text-white px-6 py-2 rounded-lg">
         Upload Resume
     </a>
 </div>
 
 <script>
-    // ⬅ Fetch username saved from login page
     let username = localStorage.getItem("username");
 
-    // Default fallback
     if (!username) username = "User";
 
-    // Time-based greeting
     const hour = new Date().getHours();
-    let timeGreeting = "";
+    let timeGreeting;
 
-    if (hour >= 5 && hour < 12) {
+    if (hour < 12) {
         timeGreeting = "Good Morning";
-    } else if (hour >= 12 && hour < 17) {
+    } else if (hour < 17) {
         timeGreeting = "Good Afternoon";
     } else {
         timeGreeting = "Good Evening";
     }
 
-    // Display final text
     document.getElementById("greeting").innerText =
         `Welcome ${username}, ${timeGreeting}!`;
 </script>
