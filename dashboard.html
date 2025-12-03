@@ -1,19 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
-    <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
-    <p class="mb-6">Welcome! Continue to upload your resume.</p>
+    
+    <!-- Dynamic Greeting -->
+    <h2 id="greeting" class="text-2xl font-bold mb-4"></h2>
+
+    <p class="mb-6">Continue to upload your resume.</p>
 
     <a href="upload.html" 
-       class="bg-purple-600 text-white px-6 py-2 rounded-lg">
+       class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
         Upload Resume
     </a>
 </div>
+
+<script>
+    // Get username from localStorage (from login page)
+    let username = localStorage.getItem("username");
+
+    // If no username found, default name
+    if (!username) username = "User";
+
+    // Time-based greeting
+    const hour = new Date().getHours();
+    let timeGreeting = "";
+
+    if (hour >= 5 && hour < 12) {
+        timeGreeting = "Good Morning";
+    } else if (hour >= 12 && hour < 17) {
+        timeGreeting = "Good Afternoon";
+    } else {
+        timeGreeting = "Good Evening";
+    }
+
+    // Set greeting text
+    document.getElementById("greeting").innerText =
+        `Welcome ${username}, ${timeGreeting}!`;
+</script>
 
 </body>
 </html>
