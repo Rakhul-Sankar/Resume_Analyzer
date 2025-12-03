@@ -5,38 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Resume</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
+<!-- Mammoth.js for DOCX -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
     <h2 class="text-2xl font-bold mb-4">Upload Your Resume</h2>
 
-    <input type="file" id="resumeFile" accept=".txt,.pdf,.doc,.docx"
+    <input type="file" id="resumeFile" accept=".txt,.pdf,.docx"
            class="mb-4 w-full p-2 border rounded-lg" />
 
     <button onclick="saveResume()" 
             class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-        Upload
+        Upload Resume
     </button>
 </div>
 
 <script>
-function saveResume() {
+async function saveResume() {
     const fileInput = document.getElementById("resumeFile");
     const file = fileInput.files[0];
-    if (!file) {
-        alert("Please select a resume first!");
-        return;
+    if (!file) return alert("Please select a resume.");
+
+    let textContent = "";
+
+    // TXT
+    if (file.name.endsWith(".txt")) {
+        textContent = await file.text();
+    } 
+    // PDF
+    else if (file.name.endsWith(".pdf")) {
+        const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const text = await page.getTextContent();
+            textContent += text.items.map(item => item.str).join(" ") + "\n";
+        }
+    } 
+    // DOCX
+    else if (file.name.endsWith(".docx")) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        textContent = result.value;
+    } 
+    else {
+        return alert("Unsupported file type! Use TXT, PDF, or DOCX.");
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        // Save file content to localStorage
-        localStorage.setItem("resumeContent", e.target.result);
-        alert("Resume uploaded successfully!");
-        window.location.href = "analyze.html"; // Go to analyze page
-    };
-    reader.readAsText(file); // Works for text-based resumes
+    localStorage.setItem("resumeContent", textContent);
+    alert("Resume uploaded successfully!");
+    window.location.href = "analyze.html";
 }
 </script>
 

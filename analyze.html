@@ -35,35 +35,31 @@
 </div>
 
 <script>
-    // Fetch uploaded resume from localStorage
-    const resume = localStorage.getItem("resumeContent");
-    if (!resume) {
-        alert("No resume found! Please upload first.");
-        window.location.href = "upload.html";
-    }
+const resume = localStorage.getItem("resumeContent");
+if (!resume) {
+    alert("No resume found! Please upload first.");
+    window.location.href = "upload.html";
+}
 
-    // Simulate ATS Score (for demo)
-    const atsScore = Math.floor(Math.random() * 21) + 80; // 80-100%
-    document.getElementById("atsScore").innerText = atsScore + "%";
+// Simulate ATS Score (80-100%)
+const atsScore = Math.floor(Math.random() * 21) + 80;
+document.getElementById("atsScore").innerText = atsScore + "%";
 
-    // List of skills to detect
-    const skills = ["Python", "Django", "HTML", "CSS", "JavaScript", "SQL", "React", "Node.js"];
+// Skills to detect
+const skills = ["Python","Django","HTML","CSS","JavaScript","SQL","React","Node.js","TailwindCSS"];
 
-    const foundSkills = skills.filter(skill => {
-        const regex = new RegExp(`\\b${skill}\\b`, "i");
-        return regex.test(resume);
+const foundSkills = skills.filter(skill => new RegExp(`\\b${skill}\\b`, "i").test(resume));
+
+const skillsList = document.getElementById("skillsList");
+if (foundSkills.length > 0) {
+    foundSkills.forEach(skill => {
+        const li = document.createElement("li");
+        li.textContent = skill;
+        skillsList.appendChild(li);
     });
-
-    const skillsList = document.getElementById("skillsList");
-    if (foundSkills.length > 0) {
-        foundSkills.forEach(skill => {
-            const li = document.createElement("li");
-            li.textContent = skill;
-            skillsList.appendChild(li);
-        });
-    } else {
-        skillsList.innerHTML = "<li>No matching skills found.</li>";
-    }
+} else {
+    skillsList.innerHTML = "<li>No matching skills found.</li>";
+}
 </script>
 
 </body>
