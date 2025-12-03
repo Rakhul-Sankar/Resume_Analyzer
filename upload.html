@@ -25,6 +25,9 @@
 </div>
 
 <script>
+// Fix PDF.js worker issue
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
+
 async function saveResume() {
     const fileInput = document.getElementById("resumeFile");
     const file = fileInput.files[0];
@@ -32,12 +35,14 @@ async function saveResume() {
 
     let textContent = "";
 
+    const fileName = file.name.toLowerCase(); // make case-insensitive
+
     // TXT
-    if (file.name.endsWith(".txt")) {
+    if (fileName.endsWith(".txt")) {
         textContent = await file.text();
     } 
     // PDF
-    else if (file.name.endsWith(".pdf")) {
+    else if (fileName.endsWith(".pdf")) {
         const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
@@ -46,7 +51,7 @@ async function saveResume() {
         }
     } 
     // DOCX
-    else if (file.name.endsWith(".docx")) {
+    else if (fileName.endsWith(".docx")) {
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         textContent = result.value;
