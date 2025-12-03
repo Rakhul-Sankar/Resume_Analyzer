@@ -1,37 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen">
 
-<div class="bg-white p-8 rounded-xl shadow-lg w-96">
-    <h2 class="text-2xl font-bold text-center mb-6">Create an Account</h2>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-    <form method="POST">
-        {% csrf_token %}
+<div class="w-full max-w-sm bg-white p-6 rounded-xl shadow-lg">
 
-        <input type="text" name="username" placeholder="Username"
-               class="w-full p-2 border rounded mb-4" required>
+    <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
 
-        <input type="email" name="email" placeholder="Email"
-               class="w-full p-2 border rounded mb-4" required>
+    <form action="login.html" method="get" class="space-y-4">
 
-        <input type="password" name="password" placeholder="Password"
-               class="w-full p-2 border rounded mb-4" required>
+        <input type="text" placeholder="Username"
+               class="w-full p-3 border rounded-lg" required>
 
-        <input type="password" name="confirm" placeholder="Confirm Password"
-               class="w-full p-2 border rounded mb-4" required>
+        <input type="email" placeholder="Email"
+               class="w-full p-3 border rounded-lg" required>
 
-        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            Sign Up
+        <input type="password" placeholder="Password"
+               class="w-full p-3 border rounded-lg" required>
+
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-lg">
+            Create Account
         </button>
     </form>
 
-    <p class="text-center mt-4 text-sm">
-        Already have an account?
-        <a href="/" class="text-blue-600">Login</a>
-    </p>
 </div>
 
 </body>
