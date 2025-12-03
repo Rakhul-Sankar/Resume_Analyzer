@@ -35,7 +35,7 @@
 </div>
 
 <script>
-// Fetch uploaded resume from localStorage
+// Fetch resume from localStorage
 let resume = localStorage.getItem("resumeContent");
 if (!resume) {
     alert("No resume found! Please upload first.");
@@ -49,18 +49,17 @@ const normalizedResume = resume.toLowerCase().replace(/\n/g, ' ').replace(/\t/g,
 const atsScore = Math.floor(Math.random() * 21) + 80;
 document.getElementById("atsScore").innerText = atsScore + "%";
 
-// Skills to detect (all lowercase)
+// Skills to detect (all lowercase for matching)
 const skills = ["python","django","html","css","javascript","sql","react","node.js","tailwindcss"];
 
-// Detect skills in normalized resume
+// Detect skills
 const foundSkills = skills.filter(skill => normalizedResume.includes(skill));
 
-// Display skills with proper capitalization
 const skillsList = document.getElementById("skillsList");
 if (foundSkills.length > 0) {
     foundSkills.forEach(skill => {
         const li = document.createElement("li");
-        // Capitalize first letter of each word
+        // Capitalize for display
         li.textContent = skill.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('.');
         skillsList.appendChild(li);
     });
