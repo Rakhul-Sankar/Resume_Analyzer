@@ -1,75 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload Resume</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PDF.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
-  <!-- Mammoth for DOCX -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Resume</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- PDF.js for PDF extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
+<!-- Mammoth.js for DOCX extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
-    <h2 class="text-2xl font-bold mb-4 text-blue-600">Upload Your Resume</h2>
 
-    <input type="file" id="resumeFile" accept=".pdf,.docx,.txt"
-           class="mb-4 w-full p-2 border rounded-lg"/>
+<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold mb-4">Upload Your Resume</h2>
+
+    <input type="file" id="resumeFile" accept=".txt,.pdf,.docx"
+           class="mb-4 w-full p-2 border rounded-lg" />
 
     <button onclick="saveResume()" 
-            class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full hover:bg-blue-700 transition">
-      Upload & Analyze
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+        Upload Resume
     </button>
-  </div>
+</div>
 
-  <script>
-    // configure PDF.js worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
+<script>
+// Set PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
 
-    async function saveResume() {
-      const input = document.getElementById("resumeFile");
-      const file = input.files[0];
-      if (!file) {
-        alert("Please select a file first.");
-        return;
-      }
+async function saveResume() {
+    const fileInput = document.getElementById("resumeFile");
+    const file = fileInput.files[0];
+    if (!file) return alert("Please select a resume.");
 
-      let text = "";
-      const name = file.name.toLowerCase();
+    let textContent = "";
 
-      try {
-        if (name.endsWith(".txt")) {
-          text = await file.text();
-        } else if (name.endsWith(".pdf")) {
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          for (let i = 1; i <= pdf.numPages; i++) {
+    const fileName = file.name.toLowerCase();
+
+    // TXT
+    if (fileName.endsWith(".txt")) {
+        textContent = await file.text();
+    } 
+    // PDF
+    else if (fileName.endsWith(".pdf")) {
+        const fileURL = URL.createObjectURL(file);
+        const pdf = await pdfjsLib.getDocument({ url: fileURL }).promise; // use { url: fileURL }
+        for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            const strs = content.items.map(item => item.str);
-            text += strs.join(" ") + "\n";
-          }
-        } else if (name.endsWith(".docx")) {
-          const buffer = await file.arrayBuffer();
-          const result = await mammoth.extractRawText({ arrayBuffer: buffer });
-          text = result.value;
-        } else {
-          alert("Unsupported file type. Please use PDF, DOCX or TXT.");
-          return;
+            const textContentItems = await page.getTextContent();
+            textContent += textContentItems.items.map(item => item.str).join(" ") + " ";
         }
-
-        // Save extracted text to localStorage
-        localStorage.setItem("resumeContent", text.trim());
-        alert("Resume uploaded successfully!");
-        window.location.href = "analyze.html"; // redirect to analyze page
-
-      } catch (err) {
-        console.error("Error while reading resume:", err);
-        alert("Failed to read resume. Try a different file or simpler PDF.");
-      }
+    } 
+    // DOCX
+    else if (fileName.endsWith(".docx")) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        textContent = result.value;
+    } 
+    else {
+        return alert("Unsupported file type! Use TXT, PDF, or DOCX.");
     }
-  </script>
+
+    // Save resume to localStorage
+    localStorage.setItem("resumeContent", textContent.trim());
+    alert("Resume uploaded successfully!");
+    window.location.href = "login.html";
+}
+</script>
+
 </body>
 </html>
