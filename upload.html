@@ -5,48 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Upload Resume</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
+  <!-- Mammoth for DOCX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="bg-white p-7 rounded-xl shadow-lg w-full max-w-md text-center">
-    <h2 class="text-2xl font-bold mb-5 text-blue-600">Upload Your Resume</h2>
+  <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold mb-4 text-blue-600">Upload Your Resume</h2>
 
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" name="resume" id="resumeFile" accept=".pdf" required
-               class="mb-4 w-full p-2 border rounded-lg"/>
-        <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full hover:bg-blue-700">
-            Upload & Analyze
-        </button>
-    </form>
+    <input type="file" id="resumeFile" accept=".pdf,.docx,.txt"
+           class="mb-4 w-full p-2 border rounded-lg"/>
 
-    <p id="loading" class="hidden text-blue-600 font-semibold mt-4">⏳ Extracting text...</p>
-</div>
+    <button onclick="saveResume()" 
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full hover:bg-blue-700 transition">
+      Upload & Analyze
+    </button>
+  </div>
 
-<script>
-document.getElementById("uploadForm").addEventListener("submit", async function(e){
-    e.preventDefault();
-    const fileInput = document.getElementById("resumeFile").files[0];
-    if(!fileInput) return alert("Select a file!");
+  <script>
+    // configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
 
-    document.getElementById("loading").classList.remove("hidden");
+    async function saveResume() {
+      const input = document.getElementById("resumeFile");
+      const file = input.files[0];
+      if (!file) {
+        alert("Please select a file first.");
+        return;
+      }
 
-    const formData = new FormData();
-    formData.append("resume", fileInput);
+      let text = "";
+      const name = file.name.toLowerCase();
 
-    try {
-        const res = await fetch("/analyze_pdf/", { method: "POST", body: formData });
-        const text = await res.text();
+      try {
+        if (name.endsWith(".txt")) {
+          text = await file.text();
+        } else if (name.endsWith(".pdf")) {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const strs = content.items.map(item => item.str);
+            text += strs.join(" ") + "\n";
+          }
+        } else if (name.endsWith(".docx")) {
+          const buffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+          text = result.value;
+        } else {
+          alert("Unsupported file type. Please use PDF, DOCX or TXT.");
+          return;
+        }
 
-        localStorage.setItem("resumeContent", text);
-        alert("Resume extracted successfully!");
-        window.location.href = "analyze.html";
-    } catch(err) {
-        console.error(err);
-        alert("Failed to extract resume text.");
-    } finally {
-        document.getElementById("loading").classList.add("hidden");
+        // Save extracted text to localStorage
+        localStorage.setItem("resumeContent", text.trim());
+        alert("Resume uploaded successfully!");
+        window.location.href = "analyze.html"; // redirect to analyze page
+
+      } catch (err) {
+        console.error("Error while reading resume:", err);
+        alert("Failed to read resume. Try a different file or simpler PDF.");
+      }
     }
-});
-</script>
+  </script>
 </body>
 </html>
