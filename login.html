@@ -9,22 +9,16 @@
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-<div class="w-full max-w-sm bg-white p-6 rounded-xl shadow-lg">
-
+<div id="login-box" class="w-full max-w-sm bg-white p-6 rounded-xl shadow-lg hidden">
     <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
 
     <form onsubmit="saveUser(event)" class="space-y-4">
-
-        <!-- Username Input -->
         <input id="username" name="username" type="text" placeholder="Username"
-               class="w-full p-3 border rounded-lg" required>
+            class="w-full p-3 border rounded-lg" required>
+        <input id="password" type="password" placeholder="Password"
+            class="w-full p-3 border rounded-lg" required>
 
-        <!-- Password Input -->
-        <input type="password" placeholder="Password"
-               class="w-full p-3 border rounded-lg" required>
-
-        <button type="submit"
-                class="w-full bg-green-600 text-white py-2 rounded-lg">
+        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg">
             Login
         </button>
     </form>
@@ -36,16 +30,22 @@
 </div>
 
 <script>
+    // On page load → Check if user already logged in
+    window.onload = () => {
+        const user = localStorage.getItem("username");
+        if (user) {
+            window.location.href = "analyze.html"; // Already logged in → redirect
+        } else {
+            document.getElementById("login-box").classList.remove("hidden");
+        }
+    };
+
+    // Login Function
     function saveUser(event) {
         event.preventDefault();
-
         const username = document.getElementById("username").value;
-
-        // Save username in localStorage
-        localStorage.setItem("username", username);
-
-        // Redirect
-        window.location.href = "analyze.html";
+        localStorage.setItem("username", username); // Save username locally
+        window.location.href = "analyze.html"; // Redirect after login
     }
 </script>
 
