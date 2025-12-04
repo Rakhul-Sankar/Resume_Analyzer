@@ -11,14 +11,9 @@
 
 <div class="w-full max-w-4xl">
 
-    <!-- Top Bar: Welcome + Logout -->
-    <div class="flex justify-between items-center mb-6">
+    <!-- Top Bar: Only Welcome Message (Logout removed) -->
+    <div class="flex justify-center items-center mb-6">
         <h2 id="welcomeUser" class="text-xl font-bold text-gray-800"></h2>
-
-        <button onclick="logout()" 
-            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-            Logout
-        </button>
     </div>
 
     <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Resume Analysis Result</h1>
@@ -49,8 +44,6 @@
 <script>
 /* ----------------- USER LOGIN CHECK ----------------- */
 let user = localStorage.getItem("username");
-
-// If no user logged in → redirect to login page
 if (!user) {
     window.location.href = "login.html";
 }
@@ -68,11 +61,11 @@ if (!resume) {
 // Normalize resume text
 const normalizedResume = resume.toLowerCase().replace(/\n/g, ' ').replace(/\t/g, ' ').replace(/\s+/g, ' ');
 
-// Generate random ATS Score (80–100%)
+// ATS Score Random (80–100%)
 const atsScore = Math.floor(Math.random() * 21) + 80;
 document.getElementById("atsScore").innerText = atsScore + "%";
 
-// Skills to detect
+// Skill Detection
 const skills = ["python","java","django","html","css","javascript","js","web development","sql","react","node.js","tailwindcss"];
 const foundSkills = skills.filter(skill => normalizedResume.includes(skill));
 
@@ -85,12 +78,6 @@ if (foundSkills.length > 0) {
     });
 } else {
     skillsList.innerHTML = "<li>No matching skills found.</li>";
-}
-
-/* ----------------- LOGOUT FUNCTION ----------------- */
-function logout() {
-    localStorage.removeItem("username");
-    window.location.href = "login.html";
 }
 </script>
 
