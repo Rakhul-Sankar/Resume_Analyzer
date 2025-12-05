@@ -6,105 +6,36 @@
 <title>Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-<div class="max-w-6xl mx-auto">
+<div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center space-y-6">
+    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+    
+    <button onclick="goProfile()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+        View Profile
+    </button>
 
-    <!-- Profile Section -->
-    <div class="bg-white p-6 rounded-xl shadow mb-6 flex items-center space-x-6">
-        <div id="profileAvatar" class="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-3xl font-bold text-white">
-            <!-- Initials -->
-        </div>
-        <div>
-            <h2 id="profileName" class="text-xl font-bold">Name</h2>
-            <p id="profileEmail" class="text-gray-500">email@example.com</p>
-            <button onclick="logout()" class="mt-2 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
-        </div>
-    </div>
+    <button onclick="goReports()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+        View Past Reports
+    </button>
 
-    <!-- Past Reports -->
-    <div class="bg-white p-6 rounded-xl shadow">
-        <h2 class="text-xl font-bold mb-4">Past Resume Reports</h2>
-        <ul id="reportsList" class="space-y-3">
-            <!-- Reports will appear here -->
-        </ul>
-        <p id="noReports" class="text-gray-500">No past reports found.</p>
-    </div>
-
+    <button onclick="logout()" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600">
+        Logout
+    </button>
 </div>
 
 <script>
-    // 1️⃣ Load logged-in user
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
-    const usernameFallback = localStorage.getItem("username");
-
-    if(!loggedInUser.name && !usernameFallback){
-        // No user logged in → redirect to login
-        window.location.href = "login.html";
-    }
-
-    const profileName = document.getElementById("profileName");
-    const profileEmail = document.getElementById("profileEmail");
-    const profileAvatar = document.getElementById("profileAvatar");
-
-    const displayName = loggedInUser.name || usernameFallback;
-    profileName.textContent = displayName;
-    profileEmail.textContent = loggedInUser.email || "";
-    const initials = displayName.split(" ").map(n => n[0].toUpperCase()).join("");
-    profileAvatar.textContent = initials;
-
-    // 2️⃣ Load past reports
-    let pastReports = JSON.parse(localStorage.getItem("pastReports") || "[]");
-
-    // If a resume was just uploaded, add it to pastReports
-    const currentResume = localStorage.getItem("resumeContent");
-    const currentFileName = localStorage.getItem("uploadedFileName");
-
-    if(currentResume && currentFileName){
-        const newReport = {
-            fileName: currentFileName,
-            content: currentResume,
-            date: new Date().toLocaleString()
-        };
-
-        // Avoid duplicates
-        if(!pastReports.some(r => r.fileName === currentFileName)){
-            pastReports.push(newReport);
-            localStorage.setItem("pastReports", JSON.stringify(pastReports));
-        }
-    }
-
-    // Display past reports
-    const reportsList = document.getElementById("reportsList");
-    const noReports = document.getElementById("noReports");
-
-    if(pastReports.length > 0){
-        noReports.style.display = "none";
-        pastReports.forEach(report => {
-            const li = document.createElement("li");
-            li.className = "p-4 border rounded hover:bg-gray-50 cursor-pointer";
-            li.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-medium">${report.fileName}</span>
-                    <span class="text-gray-500 text-sm">${report.date}</span>
-                </div>
-            `;
-            li.addEventListener("click", () => {
-                // Load this resume into analyze.html
-                localStorage.setItem("resumeContent", report.content);
-                localStorage.setItem("uploadedFileName", report.fileName);
-                window.location.href = "analyze.html";
-            });
-            reportsList.appendChild(li);
-        });
-    }
-
-    // Logout
-    function logout(){
-        localStorage.removeItem("loggedInUser");
-        localStorage.removeItem("username");
-        window.location.href = "login.html";
-    }
+function goProfile(){
+    window.location.href = "profile.html";
+}
+function goReports(){
+    window.location.href = "reports.html";
+}
+function logout(){
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("username");
+    window.location.href = "login.html";
+}
 </script>
 
 </body>
