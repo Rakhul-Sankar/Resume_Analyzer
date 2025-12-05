@@ -1,43 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Analyze Resume</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Resume</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- PDF.js for PDF extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
+<!-- Mammoth.js for DOCX extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
-        <h1 class="text-2xl font-bold mb-4">Resume Analysis</h1>
-        <h2 class="text-xl font-semibold mb-2">Detected Skills:</h2>
-        <ul id="skillsList" class="list-disc ml-6 text-lg"></ul>
-    </div>
+<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold mb-4">Upload Your Resume</h2>
+
+    <input type="file" id="resumeFile" accept=".txt,.pdf,.docx"
+           class="mb-4 w-full p-2 border rounded-lg" />
+
+    <button onclick="saveResume()" 
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+        Upload Resume
+    </button>
+</div>
 
 <script>
-const skillsList = [
-    "JavaScript","JS","Python","Django","React","Node.js","SQL",
-    "HTML","CSS","Angular","MongoDB","Machine Learning",
-    "Data Analysis","C++","Java","TypeScript","AWS","Git"
-];
+// Set PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
 
-// Get resume text from localStorage
-let resumeText = localStorage.getItem("resumeContent") || "";
-resumeText = resumeText.toLowerCase();  // Convert to lowercase for case-insensitive search
+async function saveResume() {
+    const fileInput = document.getElementById("resumeFile");
+    const file = fileInput.files[0];
+    if (!file) return alert("Please select a resume.");
 
-// Detect skills
-let detectedSkills = skillsList.filter(skill => {
-    return resumeText.includes(skill.toLowerCase());
-});
+    let textContent = "";
 
-// Display skills
-const ul = document.getElementById("skillsList");
-if(detectedSkills.length === 0){
-    ul.innerHTML = "<li>No skills detected</li>";
-} else {
-    detectedSkills.forEach(skill => {
-        const li = document.createElement("li");
-        li.textContent = skill;
-        ul.appendChild(li);
-    });
+    const fileName = file.name.toLowerCase();
+
+    // TXT
+    if (fileName.endsWith(".txt")) {
+        textContent = await file.text();
+    } 
+    // PDF
+    else if (fileName.endsWith(".pdf")) {
+        const fileURL = URL.createObjectURL(file);
+        const pdf = await pdfjsLib.getDocument({ url: fileURL }).promise; // use { url: fileURL }
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContentItems = await page.getTextContent();
+            textContent += textContentItems.items.map(item => item.str).join(" ") + " ";
+        }
+    } 
+    // DOCX
+    else if (fileName.endsWith(".docx")) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        textContent = result.value;
+    } 
+    else {
+        return alert("Unsupported file type! Use TXT, PDF, or DOCX.");
+    }
+
+    // Save resume to localStorage
+    localStorage.setItem("resumeContent", textContent.trim());
+    alert("Resume uploaded successfully!");
+    window.location.href = "login.html";
 }
 </script>
 
