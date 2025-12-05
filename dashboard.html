@@ -1,76 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-<div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center space-y-6">
-    <!-- Welcome Message -->
-    <h1 id="welcomeMessage" class="text-2xl font-bold"></h1>
-    <p class="text-gray-600">Upload a new resume to analyze</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <!-- Buttons -->
-    <button onclick="goUpload()" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
+
+    <!-- Greeting -->
+    <h2 id="greeting" class="text-2xl font-bold mb-4"></h2>
+
+    <p class="mb-6">Continue to upload your resume.</p>
+
+    <a href="upload.html" class="bg-purple-600 text-white px-6 py-2 rounded-lg">
         Upload Resume
-    </button>
-
-    <button onclick="goProfile()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-        View Profile
-    </button>
-
-    <button onclick="goReports()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
-        View Past Reports
-    </button>
-
-    <button onclick="logout()" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600">
-        Logout
-    </button>
+    </a>
 </div>
 
 <script>
-window.onload = () => {
-    // Get logged-in user
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
-    const usernameFallback = localStorage.getItem("username");
-    const displayName = loggedInUser.name || usernameFallback || "User";
+    let username = localStorage.getItem("username");
 
-    // Set welcome message with greeting
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    const hours = new Date().getHours();
-    let greeting = "Good Morning";
-    if(hours >= 12 && hours < 16) greeting = "Good Afternoon";
-    else if(hours >= 16) greeting = "Good Evening";
+    if (!username) username = "User";
 
-    welcomeMessage.textContent = `Welcome ${displayName}, ${greeting}!`;
-};
+    const hour = new Date().getHours();
+    let timeGreeting;
 
-// Navigation functions
-function goUpload(){
-    // Clear previous resume to enforce a fresh upload
-    localStorage.removeItem("resumeContent");
-    localStorage.removeItem("uploadedFileName");
-    window.location.href = "upload.html";
-}
+    if (hour < 12) {
+        timeGreeting = "Good Morning";
+    } else if (hour < 17) {
+        timeGreeting = "Good Afternoon";
+    } else {
+        timeGreeting = "Good Evening";
+    }
 
-function goProfile(){
-    window.location.href = "profile.html";
-}
-
-function goReports(){
-    window.location.href = "reports.html";
-}
-
-function logout(){
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("username");
-    localStorage.removeItem("resumeContent");
-    localStorage.removeItem("uploadedFileName");
-    window.location.href = "login.html";
-}
+    document.getElementById("greeting").innerText =
+        `Welcome ${username}, ${timeGreeting}!`;
 </script>
 
 </body>
