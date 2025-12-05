@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Resume Analysis</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 flex flex-col items-center p-6 min-h-screen">
 
 <div class="w-full max-w-4xl">
@@ -35,34 +37,50 @@
 </div>
 
 <script>
-// Fetch resume from localStorage
+/* 🔥 Get Resume From Local Storage */
 let resume = localStorage.getItem("resumeContent");
+let fileName = localStorage.getItem("uploadedFileName");
 
+/* 🛑 If no resume uploaded – redirect user */
+if (!resume || !fileName) {
+    alert("No resume detected! Please upload and analyze again.");
+    window.location.href = "upload.html";
+}
 
-// Normalize resume text: lowercase, remove line breaks/tabs, extra spaces
-const normalizedResume = resume.toLowerCase().replace(/\n/g, ' ').replace(/\t/g, ' ').replace(/\s+/g, ' ');
+/* 🔥 Normalize text */
+resume = resume.toLowerCase().replace(/\n/g," ").replace(/\t/g," ").replace(/\s+/g," ");
 
-// Simulate ATS Score (80-100%)
+/* ⭐ Generate ATS Score */
 const atsScore = Math.floor(Math.random() * 21) + 80;
 document.getElementById("atsScore").innerText = atsScore + "%";
 
-// Skills to detect (all lowercase for matching)
+/* 🔍 Skill Matching */
 const skills = ["python","java","django","html","css","javascript","js","web development","sql","react","node.js","tailwindcss"];
+const foundSkills = skills.filter(skill => resume.includes(skill));
 
-// Detect skills
-const foundSkills = skills.filter(skill => normalizedResume.includes(skill));
-
+/* Display Skills */
 const skillsList = document.getElementById("skillsList");
-if (foundSkills.length > 0) {
-    foundSkills.forEach(skill => {
-        const li = document.createElement("li");
-        // Capitalize for display
-        li.textContent = skill.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('.');
+if(foundSkills.length > 0){
+    foundSkills.forEach(skill=>{
+        let li = document.createElement("li");
+        li.textContent = skill.charAt(0).toUpperCase()+skill.slice(1);
         skillsList.appendChild(li);
     });
-} else {
-    skillsList.innerHTML = "<li>No matching skills found.</li>";
+}else{
+    skillsList.innerHTML = "<li>No matching skills found</li>";
 }
+
+/* 🔥 Save Report For Reports.html */
+let reports = JSON.parse(localStorage.getItem("resumeReports")) || [];
+reports.push({
+    filename:fileName,
+    score:atsScore,
+    date:new Date().toLocaleString(),
+    filepath:"#"
+});
+localStorage.setItem("resumeReports",JSON.stringify(reports));
+
+console.log("Report Saved Successfully");
 </script>
 
 </body>
