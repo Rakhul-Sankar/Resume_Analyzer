@@ -30,31 +30,22 @@
 </div>
 
 <script>
+    // On page load → Check if user already logged in
     window.onload = () => {
-        // Check if a user is already logged in or has uploaded a resume
-        const loggedInUser = localStorage.getItem("username");
-        const resumeContent = localStorage.getItem("resumeContent");
-
-        if (loggedInUser || resumeContent) {
-            // Already logged in or resume exists → redirect to analysis
-            window.location.href = "analyze.html";
+        const user = localStorage.getItem("username");
+        if (user) {
+            window.location.href = "analyze.html"; // Already logged in → redirect
         } else {
             document.getElementById("login-box").classList.remove("hidden");
         }
     };
 
-    // Login function
+    // Login Function
     function saveUser(event) {
         event.preventDefault();
         const username = document.getElementById("username").value;
-
-        if (!username) return alert("Enter your username");
-
-        // Save username to localStorage
-        localStorage.setItem("username", username);
-
-        // Redirect to analyze page after login
-        window.location.href = "analyze.html";
+        localStorage.setItem("username", username); // Save username locally
+        window.location.href = "analyze.html"; // Redirect after login
     }
 </script>
 
