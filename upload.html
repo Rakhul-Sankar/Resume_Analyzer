@@ -1,70 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Resume</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- PDF.js for PDF extraction -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
-<!-- Mammoth.js for DOCX extraction -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.14/mammoth.browser.min.js"></script>
+    <title>Upload Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
-    <h2 class="text-2xl font-bold mb-4">Upload Your Resume</h2>
+<body class="bg-gray-200 flex flex-col items-center justify-center h-screen">
 
-    <input type="file" id="resumeFile" accept=".txt,.pdf,.docx"
-           class="mb-4 w-full p-2 border rounded-lg" />
+    <div class="bg-white p-6 rounded-xl shadow w-96 text-center">
+        <h2 class="text-xl font-bold mb-3">Upload Your Resume</h2>
 
-    <button onclick="saveResume()" 
-            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-        Upload Resume
-    </button>
-</div>
+        <input type="file" id="resumeFile" accept=".txt,.doc,.docx" class="mb-4">
+
+        <button onclick="uploadResume()" class="bg-purple-600 text-white px-5 py-2 rounded-lg">
+            Analyze Resume →
+        </button>
+    </div>
+
 
 <script>
-// Set PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
+function uploadResume(){
+    let file = document.getElementById("resumeFile").files[0];
 
-async function saveResume() {
-    const fileInput = document.getElementById("resumeFile");
-    const file = fileInput.files[0];
-    if (!file) return alert("Please select a resume.");
-
-    let textContent = "";
-
-    const fileName = file.name.toLowerCase();
-
-    // TXT
-    if (fileName.endsWith(".txt")) {
-        textContent = await file.text();
-    } 
-    // PDF
-    else if (fileName.endsWith(".pdf")) {
-        const fileURL = URL.createObjectURL(file);
-        const pdf = await pdfjsLib.getDocument({ url: fileURL }).promise; // use { url: fileURL }
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContentItems = await page.getTextContent();
-            textContent += textContentItems.items.map(item => item.str).join(" ") + " ";
-        }
-    } 
-    // DOCX
-    else if (fileName.endsWith(".docx")) {
-        const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        textContent = result.value;
-    } 
-    else {
-        return alert("Unsupported file type! Use TXT, PDF, or DOCX.");
+    if(!file){
+        alert("Please upload a resume first!");
+        return;
     }
 
-    // Save resume to localStorage
-    localStorage.setItem("resumeContent", textContent.trim());
-    alert("Resume uploaded successfully!");
-    window.location.href = "login.html";
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+        let text = e.target.result;
+
+        // Store resume text + filename in localStorage
+        localStorage.setItem("resumeContent", text);
+        localStorage.setItem("uploadedFileName", file.name);
+
+        window.location.href = "analyze.html"; // Go to result page
+    };
+
+    reader.readAsText(file);  // Reads text resumes only
 }
 </script>
 
