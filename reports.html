@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <!-- Header -->
+    <div class="w-full bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Resume Analysis Reports</h1>
+
+        <a href="dashboard.html" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <div class="w-full max-w-4xl mt-10 bg-white p-6 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Past Resume Reports</h2>
+
+        <table class="w-full border border-gray-300">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="p-3 border">#</th>
+                    <th class="p-3 border">Filename</th>
+                    <th class="p-3 border">Score</th>
+                    <th class="p-3 border">Date</th>
+                    <th class="p-3 border">Open</th>
+                </tr>
+            </thead>
+            <tbody id="reportTable"></tbody>
+        </table>
+
+        <p id="noData" class="text-center text-gray-500 mt-4 hidden">No reports yet.</p>
+    </div>
+
+    <script>
+        function loadReports() {
+            let reports = JSON.parse(localStorage.getItem("resumeReports")) || [];
+            let table = document.getElementById("reportTable");
+            let emptyMsg = document.getElementById("noData");
+            table.innerHTML = ""; // clear before reload
+
+            if (reports.length === 0) {
+                emptyMsg.classList.remove("hidden");
+                return;
+            }
+
+            emptyMsg.classList.add("hidden");
+
+            reports.forEach((r, i) => {
+                table.innerHTML += `
+                    <tr class="text-center hover:bg-gray-100">
+                        <td class="border p-2">${i + 1}</td>
+                        <td class="border p-2">${r.filename}</td>
+                        <td class="border p-2 font-semibold text-purple-600">${r.score}%</td>
+                        <td class="border p-2">${r.date}</td>
+                        <td class="border p-2">
+                            <a href="${r.filepath}" target="_blank"
+                               class="text-blue-600 underline">Open</a>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        loadReports();
+        window.addEventListener("storage", loadReports); // Live update support
+    </script>
+
+</body>
+</html>
