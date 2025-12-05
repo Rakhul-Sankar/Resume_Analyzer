@@ -1,61 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Resume</title>
+    <title>Analyze Resume</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 </head>
+<body class="bg-gray-100 p-6">
 
-<body class="bg-gray-200 flex flex-col items-center justify-center h-screen">
-
-    <div class="bg-white p-6 rounded-xl shadow w-96 text-center">
-        <h2 class="text-xl font-bold mb-3">Upload Your Resume</h2>
-
-        <input type="file" id="resumeFile" accept=".txt,.doc,.docx" class="mb-4">
-
-        <button onclick="uploadResume()" class="bg-purple-600 text-white px-5 py-2 rounded-lg">
-            Analyze Resume →
-        </button>
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
+        <h1 class="text-2xl font-bold mb-4">Resume Analysis</h1>
+        <h2 class="text-xl font-semibold mb-2">Detected Skills:</h2>
+        <ul id="skillsList" class="list-disc ml-6 text-lg"></ul>
     </div>
 
 <script>
-function uploadResume(){
-    let file = document.getElementById("resumeFile").files[0];
+const skillsList = [
+    "JavaScript","JS","Python","Django","React","Node.js","SQL",
+    "HTML","CSS","Angular","MongoDB","Machine Learning",
+    "Data Analysis","C++","Java","TypeScript","AWS","Git"
+];
 
-    if(!file){
-        alert("Please upload a resume first!");
-        return;
-    }
+// Get resume text from localStorage
+let resumeText = localStorage.getItem("resumeContent") || "";
+resumeText = resumeText.toLowerCase();  // Convert to lowercase for case-insensitive search
 
-    const reader = new FileReader();
+// Detect skills
+let detectedSkills = skillsList.filter(skill => {
+    return resumeText.includes(skill.toLowerCase());
+});
 
-    if(file.name.endsWith(".docx")){
-        // Use Mammoth for .docx files
-        reader.onload = function(e){
-            const arrayBuffer = e.target.result;
-            mammoth.extractRawText({arrayBuffer: arrayBuffer})
-                .then(function(result){
-                    const text = result.value;
-                    localStorage.setItem("resumeContent", text);
-                    localStorage.setItem("uploadedFileName", file.name);
-                    window.location.href = "analyze.html";
-                })
-                .catch(function(err){
-                    alert("Error reading DOCX file: " + err);
-                });
-        };
-        reader.readAsArrayBuffer(file);
-
-    } else {
-        // For .txt files
-        reader.onload = function(e){
-            const text = e.target.result;
-            localStorage.setItem("resumeContent", text);
-            localStorage.setItem("uploadedFileName", file.name);
-            window.location.href = "analyze.html";
-        };
-        reader.readAsText(file);
-    }
+// Display skills
+const ul = document.getElementById("skillsList");
+if(detectedSkills.length === 0){
+    ul.innerHTML = "<li>No skills detected</li>";
+} else {
+    detectedSkills.forEach(skill => {
+        const li = document.createElement("li");
+        li.textContent = skill;
+        ul.appendChild(li);
+    });
 }
 </script>
 
