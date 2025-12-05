@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Resume</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -13,7 +12,8 @@
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md text-center">
     <h2 class="text-2xl font-bold mb-4">Upload Your Resume</h2>
 
-    <input type="file" id="resumeFile" accept=".txt,.pdf,.docx"
+    <!-- Accept only TXT and DOCX -->
+    <input type="file" id="resumeFile" accept=".txt,.docx"
            class="mb-4 w-full p-2 border rounded-lg" />
 
     <button onclick="saveResume()" 
@@ -23,39 +23,27 @@
 </div>
 
 <script>
-// Set PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.547/pdf.worker.min.js';
-
 async function saveResume() {
     const fileInput = document.getElementById("resumeFile");
     const file = fileInput.files[0];
+
     if (!file) return alert("Please select a resume.");
 
     const fileName = file.name.toLowerCase();
 
-    // Check for valid resume type
-    if (![".txt", ".pdf", ".docx"].some(ext => fileName.endsWith(ext))) {
-        return alert("Unsupported file type! Please upload a TXT, PDF, or DOCX resume.");
+    // Only allow TXT and DOCX
+    if (![".txt", ".docx"].some(ext => fileName.endsWith(ext))) {
+        return alert("Unsupported file type! Please upload a TXT or DOCX resume.");
     }
 
     let textContent = "";
 
     try {
-        // TXT
+        // TXT file
         if (fileName.endsWith(".txt")) {
             textContent = await file.text();
         } 
-        // PDF
-        else if (fileName.endsWith(".pdf")) {
-            const fileURL = URL.createObjectURL(file);
-            const pdf = await pdfjsLib.getDocument({ url: fileURL }).promise;
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textItems = await page.getTextContent();
-                textContent += textItems.items.map(item => item.str).join(" ") + " ";
-            }
-        } 
-        // DOCX
+        // DOCX file
         else if (fileName.endsWith(".docx")) {
             const arrayBuffer = await file.arrayBuffer();
             const result = await mammoth.extractRawText({ arrayBuffer });
@@ -68,12 +56,12 @@ async function saveResume() {
             return alert("Failed to extract text from resume. Make sure your file contains readable text.");
         }
 
-        // Save resume content to localStorage
+        // Save text to localStorage for analysis
         localStorage.setItem("resumeContent", textContent);
         localStorage.setItem("uploadedFileName", file.name);
 
         alert("Resume uploaded successfully!");
-        window.location.href = "analyze.html";
+        window.location.href = "analyze.html"; // Go to analysis page
 
     } catch (error) {
         alert("Error processing resume: " + error);
